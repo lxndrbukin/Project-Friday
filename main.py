@@ -2,16 +2,26 @@ from google import genai
 from utils import GEMINI_API_KEY, GEMINI_MODEL
 from tools.web_search import web_search, web_search_tool
 from tools.current_datetime import current_datetime, current_datetime_tool
+from tools.read_write_files import (
+    read_file,
+    write_file,
+    read_file_tool,
+    write_file_tool
+)
 import json
 
 function_map = {
     "web_search": web_search,
-    "current_datetime": current_datetime
+    "current_datetime": current_datetime,
+    "read_file": read_file,
+    "write_file": write_file
 }
 
 tools = [
     current_datetime_tool,
-    web_search_tool
+    web_search_tool,
+    read_file_tool,
+    write_file_tool
 ]
 
 def get_response(prompt: str, client: genai.Client):
