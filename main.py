@@ -19,6 +19,7 @@ def get_response(prompt: str, client: genai.Client):
         return "Please enter a message"
     current_input = prompt
     previous_id = None
+    safety_counter = 0
     while True:
         response = client.interactions.create(
             model=GEMINI_MODEL,
@@ -37,6 +38,9 @@ def get_response(prompt: str, client: genai.Client):
                     "call_id": step.id,
                     "result": [{"type": "text", "text": json.dumps(result)}],
                 })
+        safety_counter += 1
+        if safety_counter >= 10:
+            return "Too many tool calls executed"
         if function_results:
             current_input = function_results
             previous_id = response.id
