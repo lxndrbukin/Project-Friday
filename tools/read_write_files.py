@@ -40,7 +40,7 @@ read_file_tool = {
     }
 }
 
-BASE_DIR = "friday_files"
+BASE_DIR = "files"
 
 def write_file(
         file_name: str,
