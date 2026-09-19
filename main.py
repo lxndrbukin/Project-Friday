@@ -1,5 +1,12 @@
 from google import genai
-from utils import GEMINI_API_KEY, GEMINI_MODEL
+from utils import (
+    GEMINI_API_KEY, 
+    GEMINI_MODEL,
+    save_history, 
+    fetch_history, 
+    list_conversations,
+    print_conversations
+)
 from tools.web_search import web_search, web_search_tool
 from tools.current_datetime import current_datetime, current_datetime_tool
 from tools.read_write_files import (
@@ -8,7 +15,6 @@ from tools.read_write_files import (
     read_file_tool,
     write_file_tool
 )
-from utils import save_history, fetch_history
 import json
 
 function_map = {
@@ -92,12 +98,23 @@ def get_response(
 def main():
     client = genai.Client(api_key=GEMINI_API_KEY)
     conv_id = None
+    action = int(input("Hello, I'm Friday, your friendly AI assistant!\n Please select an action:\n1. Start new chat\n2. Continue existing chat\n3. Exit\n"))
+    if action == 2:
+        conversations = list_conversations()
+        print_conversations(conversations)
+        choice = int(input("Select chat number:\n"))
+        conv_id = conversations[choice-1]["id"]
+        data = fetch_history(conv_id)
+        for message in data["messages"]:
+            print(f"{'○ You' if message['role'] == 'user' else '● Friday'}:\n{message['content']}")
+    elif action == 3:
+        return
     while True:
-        prompt = input('○ You:\n')
-        if prompt.lower() in ['q', 'exit', 'quit']:
+        prompt = input("○ You:\n")
+        if prompt.lower() in ["q", "exit", "quit"]:
             break
         conv_id, response = get_response(client, prompt, conv_id)
         print(f"● Friday:\n{response}")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

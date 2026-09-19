@@ -38,12 +38,38 @@ def save_history(
                 "previous_interaction_id": previous_interaction_id,
                 "messages": messages
             }
-            json.dump(data, f)
+            json.dump(data, f, indent=4)
         return new_conv_id
     else:
         existing_data = fetch_history(conv_id)
         existing_data["messages"] = existing_data["messages"] + messages
         existing_data["previous_interaction_id"] = previous_interaction_id
         with open(file_path, "w") as f:
-            json.dump(existing_data, f)
+            json.dump(existing_data, f, indent=4)
         return conv_id
+
+def list_conversations():
+    history_dir = os.path.join(os.path.dirname(__file__), "history")
+    os.makedirs(history_dir, exist_ok=True)
+    conversations = []
+    for file_name in os.listdir(history_dir):
+        if not file_name.endswith('.json'):
+            continue
+        conv_id = file_name.removesuffix('.json')
+        data = fetch_history(conv_id)
+        file_path = os.path.join(history_dir, file_name)
+        conversations.append({
+            "id": conv_id, 
+            "title": data["title"],
+            "modified": os.path.getmtime(file_path)
+        })
+    conversations.sort(key=lambda c: c["modified"], reverse=True)
+    return conversations
+
+def print_conversations(conversations):
+    if not conversations:
+        print("No saved conversations found.")
+        return
+    print("○ Past conversations:")
+    for i, conv in enumerate(conversations, start=1):
+        print(f"  {i}. {conv['title']}")
