@@ -5,7 +5,8 @@ from utils import (
     save_history, 
     fetch_history, 
     list_conversations,
-    print_conversations
+    print_conversations,
+    get_int_input
 )
 from tools.web_search import web_search, web_search_tool
 from tools.current_datetime import current_datetime, current_datetime_tool
@@ -98,15 +99,24 @@ def get_response(
 def main():
     client = genai.Client(api_key=GEMINI_API_KEY)
     conv_id = None
-    action = int(input("Hello, I'm Friday, your friendly AI assistant!\n Please select an action:\n1. Start new chat\n2. Continue existing chat\n3. Exit\n"))
+    action = get_int_input(
+        "Hello, I'm Friday, your friendly AI assistant!\n Please select an action:\n1. Start new chat\n2. Continue existing chat\n3. Exit\n",
+        valid_options=[1,2,3]    
+    )
     if action == 2:
         conversations = list_conversations()
-        print_conversations(conversations)
-        choice = int(input("Select chat number:\n"))
-        conv_id = conversations[choice-1]["id"]
-        data = fetch_history(conv_id)
-        for message in data["messages"]:
-            print(f"{'○ You' if message['role'] == 'user' else '● Friday'}:\n{message['content']}")
+        if not conversations:
+            print("● Friday:\nCurrently no existing conversations.\nStarting a new chat...")
+        else:
+            print_conversations(conversations)
+            choice = get_int_input(
+                "Select chat number:\n", 
+                valid_options=list(range(1, len(conversations) + 1))
+            )
+            conv_id = conversations[choice-1]["id"]
+            data = fetch_history(conv_id)
+            for message in data["messages"]:
+                print(f"{'○ You' if message['role'] == 'user' else '● Friday'}:\n{message['content']}")
     elif action == 3:
         return
     while True:

@@ -73,3 +73,16 @@ def print_conversations(conversations):
     print("○ Past conversations:")
     for i, conv in enumerate(conversations, start=1):
         print(f"  {i}. {conv['title']}")
+
+def get_int_input(prompt, valid_options=None):
+    while True:
+        raw = input(prompt)
+        try:
+            value = int(raw)
+        except ValueError:
+            print("Please enter a number.")
+            continue
+        if valid_options and value not in valid_options:
+            print("Please select one of the above options.")
+            continue
+        return value
