@@ -9,8 +9,10 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
+HISTORY_DIR = os.path.join(os.path.dirname(__file__), "history")
+
 def fetch_history(conv_id: str):
-    file_path = os.path.join(os.path.dirname(__file__), f"history/{conv_id}.json")
+    file_path = os.path.join(HISTORY_DIR, f"{conv_id}.json")
     if not conv_id or not os.path.exists(file_path):
         return "Conversation doesn't exist"
     with open(file_path, "r") as f:
@@ -22,14 +24,14 @@ def save_history(
     previous_interaction_id: str | None = None,
     messages: list = []
 ):
-    os.makedirs("history", exist_ok=True)
-    file_path = os.path.join(os.path.dirname(__file__), f"history/{conv_id}.json")
+    os.makedirs(HISTORY_DIR, exist_ok=True)
+    file_path = os.path.join(HISTORY_DIR, f"{conv_id}.json")
     if not conv_id or not os.path.exists(file_path):
         timestamp = datetime.now().strftime("%d-%m-%Y_%H%M%S")
         new_conv_id = f"conv_{timestamp}"
         new_file_path = os.path.join(
-            os.path.dirname(__file__), 
-            f"history/{new_conv_id}.json"
+            HISTORY_DIR, 
+            f"{new_conv_id}.json"
         )
         with open(new_file_path, "w") as f:
             data = {
@@ -49,15 +51,14 @@ def save_history(
         return conv_id
 
 def list_conversations():
-    history_dir = os.path.join(os.path.dirname(__file__), "history")
-    os.makedirs(history_dir, exist_ok=True)
+    os.makedirs(HISTORY_DIR, exist_ok=True)
     conversations = []
-    for file_name in os.listdir(history_dir):
+    for file_name in os.listdir(HISTORY_DIR):
         if not file_name.endswith('.json'):
             continue
         conv_id = file_name.removesuffix('.json')
         data = fetch_history(conv_id)
-        file_path = os.path.join(history_dir, file_name)
+        file_path = os.path.join(HISTORY_DIR, file_name)
         conversations.append({
             "id": conv_id, 
             "title": data["title"],
